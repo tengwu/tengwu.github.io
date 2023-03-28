@@ -69,25 +69,25 @@ params:
         url: tags
 
   # home-info mode
-  homeInfoParams:
-    Title: "Hi there \U0001F44B"
-    Content: Welcome to my blog
+  # homeInfoParams:
+  #   Title: "Hi there \U0001F44B"
+  #   Content: Welcome to my blog
 
-  socialIcons:
-    - name: twitter
-      url: "https://twitter.com/"
-    - name: stackoverflow
-      url: "https://stackoverflow.com"
-    - name: github
-      url: "https://github.com/"
+  # socialIcons:
+  #   - name: twitter
+  #     url: "https://twitter.com/"
+  #   - name: stackoverflow
+  #     url: "https://stackoverflow.com"
+  #   - name: github
+  #     url: "https://github.com/"
 
-  analytics:
-    google:
-      SiteVerificationTag: "XYZabc"
-    bing:
-      SiteVerificationTag: "XYZabc"
-    yandex:
-      SiteVerificationTag: "XYZabc"
+  # analytics:
+  #   google:
+  #     SiteVerificationTag: "XYZabc"
+  #   bing:
+  #     SiteVerificationTag: "XYZabc"
+  #   yandex:
+  #     SiteVerificationTag: "XYZabc"
 
   cover:
     hidden: true # hide everywhere but not in structured data
@@ -119,10 +119,10 @@ menu:
       name: tags
       url: /tags/
       weight: 20
-    - identifier: 
-      name: example.org
-      url: https://example.org
-      weight: 30
+    # - identifier: 
+    #   name: tengwu.org
+    #   url: https://example.org
+    #   weight: 30
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:
