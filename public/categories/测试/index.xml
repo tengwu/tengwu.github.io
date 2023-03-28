@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Tags on me</title>
-    <link>http://tengwu.quest/tags/</link>
-    <description>Recent content in Tags on me</description>
+    <title>测试 on me</title>
+    <link>http://tengwu.quest/categories/%E6%B5%8B%E8%AF%95/</link>
+    <description>Recent content in 测试 on me</description>
     <image>
       <title>me</title>
       <url>http://tengwu.quest/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
@@ -11,14 +11,14 @@
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 28 Mar 2023 13:33:00 +0800</lastBuildDate><atom:link href="http://tengwu.quest/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 28 Mar 2023 13:33:00 +0800</lastBuildDate><atom:link href="http://tengwu.quest/categories/%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>测试</title>
-      <link>http://tengwu.quest/tags/%E6%B5%8B%E8%AF%95/</link>
+      <title>测试文章</title>
+      <link>http://tengwu.quest/hugo/content/post/2023/03/test/</link>
       <pubDate>Tue, 28 Mar 2023 13:33:00 +0800</pubDate>
       
-      <guid>http://tengwu.quest/tags/%E6%B5%8B%E8%AF%95/</guid>
-      <description></description>
+      <guid>http://tengwu.quest/hugo/content/post/2023/03/test/</guid>
+      <description>test DONE test title DONE void fun() {} TODO test title TODO </description>
     </item>
     
   </channel>

@@ -1,0 +1,106 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../hugo
+#+HUGO_SECTION: post/2023/03
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-03-28 Tue 14:01]
+#+TITLE: CS143 PA1
+#+HUGO_TAGS: CS143 编译
+#+HUGO_CATEGORIES: 编译
+
+* Lexer
+** 整体项目结构
+宏观的目录结构如下：
+#+BEGIN_SRC sh
+  $ tree cs143 -L 1
+  cs143
+  ├── assignments
+  ├── bin
+  ├── etc
+  ├── examples
+  ├── handouts
+  ├── include
+  ├── lib
+  └── src
+#+END_SRC
+=cs143= 目录包含了所有实验所需的文件，其中：
+1. =include= 目录包含了实验所需头文件
+2. =assignments= 目录包含了所有实验所需的源文件，实验过程中只需要修改 =assignments= 目录下的源文件就可以了
+3. =bin= 目录包含了部分实验所需的二进制文件，比如 =MIPS= 模拟器 =spim= 等
+4. =etc= 目录包含了一个名为 =link-object= 的二进制程序
+4. =examples= 目录包含了一些 =cool= 语言写的代码示例
+5. =handouts= 目录包含了实验手册
+6. =lib= 目录包含了一些 =java= 的库文件，如果选择使用 =C++= 来做实验，可以忽略这个目录
+7. =src= 目录包含了实验中所有用到的源文件以及一些二进制文件，不太明白这个目录的意义，但是应该可以忽略
+=assigments= 目录结构如下所示：
+#+BEGIN_SRC sh
+  $ tree assigments
+  assigments
+  ├── PA1
+  │   ├── Makefile
+  │   ├── README
+  │   ├── atoi.cl
+  │   ├── stack.cl
+  │   ├── stack.s
+  │   └── stack.test
+  ├── PA2
+  │   ├── Makefile
+  │   ├── README
+  │   ├── cool-lex.cc
+  │   ├── cool-lex.d
+  │   ├── cool-lex.o
+  │   ├── cool.flex
+  │   ├── handle_flags.cc
+  │   ├── handle_flags.d
+  │   ├── handle_flags.o
+  │   ├── lexer
+  │   ├── lextest.cc
+  │   ├── lextest.d
+  │   ├── lextest.o
+  │   ├── mycoolc
+  │   ├── stringtab.cc
+  │   ├── stringtab.d
+  │   ├── stringtab.o
+  │   ├── test.cl
+  │   ├── test.output
+  │   ├── utilities.cc
+  │   ├── utilities.d
+  │   └── utilities.o
+  ├── PA3
+  │   ├── Makefile
+  │   ├── README
+  │   ├── bad.cl
+  │   ├── cool-parse.d
+  │   ├── cool-tree.aps
+  │   ├── cool-tree.cc
+  │   ├── cool-tree.d
+  │   ├── cool-tree.handcode.h
+  │   ├── cool.output
+  ...
+#+END_SRC
+每一个实验所需的源文件都位于单独的目录中，实验使用 =make= 作为构建工具。
+实验提供了标准二进制程序供我们参考，例如PA2中，可以使用 =bin/lexer= 作为参考程序，当我们实现了自己的词法分析器后，可以对比 =bin/lexer= 的输出和我们自己写的词法分析器的输出来判断我们的实现是否正确。 =examples= 目录中有一些 =cool= 程序可供使用。
+** Makefile
+PA2提供的 =Makefile= 中，最重要的目标是 =lexer= ， =make lexer= 会生成二进制程序 =lexer= 。
+除此之外， =dotest= 目标会使用生成的 =lexer= 对测试代码 =test.cl= 做词法分析。
+** lexer代码分析
+*** 从 =main= 函数开始
+=lexer= 的入口位于 =lextest.cc:main= ，它的作用是不断地对命令行参数提供的 =cool= 源文件进行词法分析，并打印出得到的 =tokens= 。
+主要代码为：
+#+BEGIN_SRC cpp
+  while ((token = cool_yylex()) != 0) {
+    dump_cool_token(cout, curr_lineno, token, cool_yylval);
+  }
+#+END_SRC
+=cool_yylex()= 函数会从 =fin= 文件句柄输入读取字符串（这个功能是在 =cool.flex= 里通过重新定义 =YY_INPUT= 宏来实现的），并分析其中的 =token= ，为了分析不同的文件， =main= 函数先使用如下代码将文件打开为 =fin= 文件句柄：
+#+BEGIN_SRC cpp
+  fin = fopen(argv[optind], "r");
+#+END_SRC
+=cool_yylex()= 函数实际上就是 =yylex()= 函数（使用宏定义实现函数重命名），而 =yylex()= 函数是由 =flex= 生成的。
+调用 =yylex()= 函数会去执行 =cool.flex= 里 =rules= 中的规则匹配，如果匹配到相应的字符串，会执行对应的 =action= 。当遇到EOF或者遇到 =actions= 里的 =return= 语句后， =yylex()= 函数返回；当再次调用 =yylex()= 函数时，会接着分析 =fin= 中剩余的字符。
+关于 =yylex()= 以及 =flex= 所生成的其他文件细节，请阅读[[https://westes.github.io/flex/manual/Generated-Scanner.html#Generated-Scanner][Flex Manual: Ch.9 The Generated Scanner]]。
+打印 =tokens= 是通过 =TODO= 函数来实现的，这里使用到了名为 =TODO= 的全局变量，这个变量是在 =TODO= 定义的，并且在 =TODO= 头文件中通过 =extern= 导出。
+*** TODO =flex= 帮我们做了什么事情？他是怎么做到的？
+*** TODO 充分利用 =flex= 这一工具
+*** TODO 我们要做的任务
