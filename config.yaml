@@ -95,8 +95,8 @@ params:
     hiddenInSingle: true # hide on single page
 
   editPost:
-    URL: "https://github.com/<path_to_repo>/content"
-    Text: "Suggest Changes" # edit text
+    URL: "https://github.com/tengwu/tengwu.github.io/blob/master/content"
+    Text: "修改建议" # edit text
     appendFilePath: true # to append file path to Edit link
 
   # for search
