@@ -12,7 +12,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      # 修改时区
       - name: Set Timezone
 	run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
@@ -24,7 +23,6 @@ jobs:
       - name: Setup Hugo
 	uses: peaceiris/actions-hugo@v2
 	with:
-	  # 建议和本地用的版本保持一致，从而获得一致的体验
 	  hugo-version: '0.111.3'
 	  extended: true
 
@@ -41,6 +39,5 @@ jobs:
 	  # publish_dir: hugo/public
 	  deploy_key: ${{ secrets.DEPLOY_KEY }}
 	  external_repository: tengwu/tengwu.github.io
-	  # 默认是master目录，github上可修改
 	  publish_branch: master
 	  publish_dir: hugo/public
