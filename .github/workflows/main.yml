@@ -6,6 +6,10 @@ on:
       - main  # Set a branch to deploy
   pull_request:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   deploy:
     runs-on: ubuntu-20.04
@@ -13,21 +17,21 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - name: Set Timezone
-	run: sudo timedatectl set-timezone 'Asia/Shanghai'
+        run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
       - uses: actions/checkout@v2
-	with:
-	  submodules: true  # Fetch Hugo themes (true OR recursive)
-	  fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
 
       - name: Setup Hugo
-	uses: peaceiris/actions-hugo@v2
-	with:
-	  hugo-version: '0.111.3'
-	  extended: true
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.111.3'
+          extended: true
 
       - name: Build
-	run: |
+        run: |
 	  hugo --source hugo --minify --buildFuture --buildExpired
 
       - name: Deploy
