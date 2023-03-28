@@ -101,6 +101,78 @@ PA2提供的 =Makefile= 中，最重要的目标是 =lexer= ， =make lexer= 会
 调用 =yylex()= 函数会去执行 =cool.flex= 里 =rules= 中的规则匹配，如果匹配到相应的字符串，会执行对应的 =action= 。当遇到EOF或者遇到 =actions= 里的 =return= 语句后， =yylex()= 函数返回；当再次调用 =yylex()= 函数时，会接着分析 =fin= 中剩余的字符。
 关于 =yylex()= 以及 =flex= 所生成的其他文件细节，请阅读[[https://westes.github.io/flex/manual/Generated-Scanner.html#Generated-Scanner][Flex Manual: Ch.9 The Generated Scanner]]。
 打印 =tokens= 是通过 =TODO= 函数来实现的，这里使用到了名为 =TODO= 的全局变量，这个变量是在 =TODO= 定义的，并且在 =TODO= 头文件中通过 =extern= 导出。
-*** TODO =flex= 帮我们做了什么事情？他是怎么做到的？
-*** TODO 充分利用 =flex= 这一工具
+*** =flex= 简介
+=flex= 是一款基于 =Lex= 的词法分析器生成器。它可以用来自动生成用于解析输入流的程序代码。它接受一个词法规则文件作为输入，该文件包含了要匹配的模式以及对应的操作（ =action= ）。 =flex= 会根据这些规则生成一个C语言程序，该程序可以读入输入流并根据规则进行匹配和解析。
+
+在 =flex= 中，用户可以使用正则表达式来描述模式。这些模式可以包括字符、字符集、元字符、子表达式等等。在识别出匹配的模式之后， =flex= 会执行相应的操作，这些操作可以是输出到文件、修改词法分析器状态等等。用户也可以使用自定义的C代码来替代 =flex= 生成的默认操作（默认操作是将匹配到的模式输出到标准输出中）。
+
+=flex= 的内部实现是基于 =DFA（Deterministic Finite Automaton，确定有限状态自动机）= 算法的。 =DFA= 是一种表示正则表达式的图形化方法，它将每个正则表达式都转化为一个有限状态自动机。在词法分析的过程中， =flex= 将输入文本逐个字符地与 =DFA= 中的状态进行匹配，直到匹配到一个终止状态，即可确定匹配到的单词类型。
+
+=flex= 的内部实现包括两个主要部分：扫描器生成器和扫描器。扫描器生成器是用于生成自定义的词法分析器的工具，它将 =flex= 输入的规则转化为C语言程序。扫描器是由生成器生成的C语言程序，它接收输入文本并对其进行词法分析，返回匹配到的单词类型和相应的值。
+
+在实现中， =flex= 使用了许多技术来提高词法分析的性能和效率，例如快速字符串匹配算法、状态压缩、缓存等等。这些技术使得 =flex= 能够快速地处理大量的输入数据，并生成高效的词法分析器。
+*** 充分利用 =flex= 这一工具
+=flex= 常用于编译器和解释器的开发中，它可以生成高效且可靠的词法分析器，帮助程序员简化词法分析的实现过程。
+
+在PA1中，我们使用 =flex= 来实现语法分析器。
+
+使用 =flex= 进行词法分析的一般步骤如下：
+1. 定义词法规则：使用正则表达式定义词法单元（token）的模式和匹配规则。例如，可以定义一个词法规则，使得在输入文本中匹配到数字串时识别出它是一个数字类型的词法单元。
+2. 生成词法分析器代码：使用flex工具将词法规则文件转化为C语言词法分析器代码。
+3. 编译和链接：将生成的C语言词法分析器代码编译成可执行程序，并将其链接到主程序中。
+4. 运行程序：输入要分析的文本，词法分析器会根据预定义的规则逐个识别单词，并输出匹配到的词法单元类型和值。
+
+下面是一个简单的例子，用于匹配最简单的算术表达式：
+1. 定义词法规则（.flex）文件
+   #+BEGIN_SRC c
+     %{
+     #include <stdio.h>
+     %}
+
+     %%
+     [0-9]+     { printf("NUMBER %s\n", yytext); }
+     [-+*/()]  { printf("OPERATOR %c\n", yytext[0]); }
+     [ \t\n]    { /* ignore whitespace */ }
+     .          { printf("INVALID %c\n", yytext[0]); }
+     %%
+
+     int main() {
+         yylex();
+         return 0;
+     }
+   #+END_SRC
+2. 使用 =flex= 生成词法分析器代码（C语言代码）：
+   #+BEGIN_SRC sh
+     $ flex lexer.flex
+   #+END_SRC
+   上述命令会生成名为 =lex.yy.c= 的文件。
+3. 编译并链接生成的C文件：
+   #+BEGIN_SRC sh
+     $ gcc -o lexer lex.yy.c -lfl
+   #+END_SRC
+4. 运行程序：
+   #+BEGIN_SRC sh
+     $ ./lexer < input.txt
+   #+END_SRC
+   其中， =input.txt= 内容如下：
+   #+BEGIN_SRC scss
+     1 + 2 * 3 - (4 / 2)
+   #+END_SRC
+5. 运行程序后会得到如下输出：
+   #+BEGIN_SRC scss
+     NUMBER 1
+     OPERATOR +
+     NUMBER 2
+     OPERATOR *
+     NUMBER 3
+     OPERATOR -
+     OPERATOR (
+     NUMBER 4
+     OPERATOR /
+     NUMBER 2
+     OPERATOR )
+
+   #+END_SRC
+
+为了使用 =flex= 对 =cool= 程序进行词法分析，需要定义 =cool= 的词法规则。
 *** TODO 我们要做的任务
