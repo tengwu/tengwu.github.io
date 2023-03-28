@@ -101,7 +101,7 @@ PA2提供的 =Makefile= 中，最重要的目标是 =lexer= ， =make lexer= 会
 调用 =yylex()= 函数会去执行 =cool.flex= 里 =rules= 中的规则匹配，如果匹配到相应的字符串，会执行对应的 =action= 。当遇到EOF或者遇到 =actions= 里的 =return= 语句后， =yylex()= 函数返回；当再次调用 =yylex()= 函数时，会接着分析 =fin= 中剩余的字符。
 关于 =yylex()= 以及 =flex= 所生成的其他文件细节，请阅读[[https://westes.github.io/flex/manual/Generated-Scanner.html#Generated-Scanner][Flex Manual: Ch.9 The Generated Scanner]]。
 打印 =tokens= 是通过 =TODO= 函数来实现的，这里使用到了名为 =TODO= 的全局变量，这个变量是在 =TODO= 定义的，并且在 =TODO= 头文件中通过 =extern= 导出。
-*** =flex= 简介
+** =flex= 简介
 =flex= 是一款基于 =Lex= 的词法分析器生成器。它可以用来自动生成用于解析输入流的程序代码。它接受一个词法规则文件作为输入，该文件包含了要匹配的模式以及对应的操作（ =action= ）。 =flex= 会根据这些规则生成一个C语言程序，该程序可以读入输入流并根据规则进行匹配和解析。
 
 在 =flex= 中，用户可以使用正则表达式来描述模式。这些模式可以包括字符、字符集、元字符、子表达式等等。在识别出匹配的模式之后， =flex= 会执行相应的操作，这些操作可以是输出到文件、修改词法分析器状态等等。用户也可以使用自定义的C代码来替代 =flex= 生成的默认操作（默认操作是将匹配到的模式输出到标准输出中）。
@@ -175,4 +175,39 @@ PA2提供的 =Makefile= 中，最重要的目标是 =lexer= ， =make lexer= 会
    #+END_SRC
 
 为了使用 =flex= 对 =cool= 程序进行词法分析，需要定义 =cool= 的词法规则。
-*** TODO 我们要做的任务
+
+** 我们要做的任务
+我们要做的任务主要是使用 =flex= 对 =cool= 的词法规则进行说明。
+
+编写词法规则的一般步骤如下：
+1. 使用正则表达式定义词法单元的模式和匹配规则。
+2. 将每个模式与对应的动作（action）关联起来。动作是在匹配到相应模式时要执行的C语言代码。
+3. 在规则文件的头部声明C语言头文件和其他需要使用的库或函数。
+4. 在规则文件的主体部分定义每个词法单元的模式和对应的动作。
+
+=flex= 的规则及动作编写方法细节请参考[[https://westes.github.io/flex/manual/][手册]]。
+
+以 =INT_CONST= 为例，需要先在 =lexer.flex= 文件的 =definitions= 部分使用正则表达式定义整数的模式，接着在 =rules= 部分定义匹配到 =INT_CONST= 后该执行什么操作。从 =lexer.flex= 截取出的代码如下：
+#+BEGIN_SRC c
+  %{
+  ...
+  %}
+
+  ...
+  DIGIT  [0-9]
+
+  %%
+
+  {DIGIT}+  {
+    yylval.symbol = inttable.add_string(yytext);
+    return INT_CONST;
+  }
+
+  %%
+
+  ...
+#+END_SRC
+
+我们在 =definitions= 部分定义了 =DIGIT= 的模式为0-9的数字，并在 =rules= 部分说明了，匹配到若干个 =DIGIT= （ ={DIGIT}+= ）后，调用 =add_string= 函数将 =yytext= 添加到 =inttable= 中，同时设置全局变量 =yylval.symbol= 为这个 =token= 的指针，方便后面使用；最后返回这个 =token= 的类型 =INT_CONST= 。 =flex= 实际上会把我们这里编写的 =rules= 代码原封不动地粘贴到 =yylex= 函数中，也就是说，在我们调用 =yylex= 函数的时候，如果匹配到 ={DIGIT}+=， =yylex= 函数会返回 =INT_CONST= 。（所以在 =lextest.cc= 的 =main= 函数中，其实是在不断地执行 =yylex()= 函数来获取每一个 =token= ）
+
+接着，只需要按照上述方式把其他规则描述出来即可。这里就不贴其他的规则实现了。
