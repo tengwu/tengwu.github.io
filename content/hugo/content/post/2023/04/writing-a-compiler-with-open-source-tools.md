@@ -1,7 +1,7 @@
 +++
 title = "使用flex, bison, llvm实现编译器"
 date = 2023-04-02T14:12:00+08:00
-lastmod = 2023-04-02T18:38:09+08:00
+lastmod = 2023-04-02T18:40:05+08:00
 tags = ["编译", "LLVM"]
 categories = ["编译", "LLVM"]
 draft = false
@@ -233,48 +233,47 @@ link_directories(${LLVM_LIBRARY_DIRS})
 
 给项目中添加了上述 `CMakeLists.txt` 文件后,项目可以正常编译运行.
 
-<!--list-separator-->
 
--  find_package
+#### find_package {#find-package}
 
-    `find_package()` 是 `cmake` 中的一个命令,用于在系统上查找已安装的软件包,并设置相关变量.这个命令主要用于在
-     `cmake` 构建系统中引入第三方库。
+`find_package()` 是 `cmake` 中的一个命令,用于在系统上查找已安装的软件包,并设置相关变量.这个命令主要用于在
+ `cmake` 构建系统中引入第三方库。
 
-    当使用 `find_package()` 命令查找软件包时, `cmake` 会在系统路径下查找该软件包，并设置相关变量,例如该软件包
-    的头文件路径,库文件路径,链接库等信息.一旦成功找到软件包,就可以将其与项目链接起来,使您的项目能够使用该软件
-    包提供的功能.
+当使用 `find_package()` 命令查找软件包时, `cmake` 会在系统路径下查找该软件包，并设置相关变量,例如该软件包
+的头文件路径,库文件路径,链接库等信息.一旦成功找到软件包,就可以将其与项目链接起来,使您的项目能够使用该软件
+包提供的功能.
 
-    通常，使用 `find_package()` 命令需要执行以下步骤：
+通常，使用 `find_package()` 命令需要执行以下步骤：
 
-    1.  在 `CMakeLists.txt` 文件中加入 `find_package()` 命令，例如： `find_package(PackageName REQUIRED)`,这里
+1.  在 `CMakeLists.txt` 文件中加入 `find_package()` 命令，例如： `find_package(PackageName REQUIRED)`,这里
 
-    的 `PackageName` 是要查找的软件包名称,如果该软件包不存在或未安装, `cmake` 将会在输出中报告错误.如果软件包
-    存在, `cmake` 会设置相关变量,例如包含路径,库文件路径等
+的 `PackageName` 是要查找的软件包名称,如果该软件包不存在或未安装, `cmake` 将会在输出中报告错误.如果软件包
+存在, `cmake` 会设置相关变量,例如包含路径,库文件路径等
 
-    1.  在 `CMakeLists.txt` 文件中使用 `include_directories()` 命令或 `target_include_directories()` 命令将包&gt;含路径添加到项目中
-    2.  使用 `add_library()` 或 `add_executable()` 命令将源文件与该软件包链接起来,例如:
-        ```nil
-        add_executable(MyApp main.cpp)
-        target_link_libraries(MyApp PackageName)
-        ```
-        这里的 `PackageName` 是要使用的软件包名称
+1.  在 `CMakeLists.txt` 文件中使用 `include_directories()` 命令或 `target_include_directories()` 命令将包&gt;含路径添加到项目中
+2.  使用 `add_library()` 或 `add_executable()` 命令将源文件与该软件包链接起来,例如:
+    ```nil
+    add_executable(MyApp main.cpp)
+    target_link_libraries(MyApp PackageName)
+    ```
+    这里的 `PackageName` 是要使用的软件包名称
 
-    默认情况下, `find_package` 会从以下几个地方查找包：
+默认情况下, `find_package` 会从以下几个地方查找包：
 
-    1.  `CMAKE_PREFIX_PATH` :这是一个用分号分隔的路径列表, `cmake` 会在这些路径中查找安装的包
-    2.  环境变量:如果在 `CMAKE_PREFIX_PATH` 中找不到包, `cmake` 会检查环境变量，例如在 `linux` 上, `cmake` 会&gt;检查 `PKG_CONFIG_PATH` 变量
-    3.  `cmake` 内置模块: `cmake` 附带了许多内置模块,用于查找常见的包,比如我们上面使用的 `flex` 和 `bison`
-    4.  模块路径: `cmake` 允许开发人员编写自己的模块并在 `cmake` 脚本中使用它们.如果包不在 `CMAKE_PREFIX_PATH` 或内置模块中,则 `cmake` 会查找用户定义的模块路径
+1.  `CMAKE_PREFIX_PATH` :这是一个用分号分隔的路径列表, `cmake` 会在这些路径中查找安装的包
+2.  环境变量:如果在 `CMAKE_PREFIX_PATH` 中找不到包, `cmake` 会检查环境变量，例如在 `linux` 上, `cmake` 会&gt;检查 `PKG_CONFIG_PATH` 变量
+3.  `cmake` 内置模块: `cmake` 附带了许多内置模块,用于查找常见的包,比如我们上面使用的 `flex` 和 `bison`
+4.  模块路径: `cmake` 允许开发人员编写自己的模块并在 `cmake` 脚本中使用它们.如果包不在 `CMAKE_PREFIX_PATH` 或内置模块中,则 `cmake` 会查找用户定义的模块路径
 
-    `find_package` 会设置一些变量,以便用户在 `CMakeLists.txt` 文件中使用.这些变量包括:
+`find_package` 会设置一些变量,以便用户在 `CMakeLists.txt` 文件中使用.这些变量包括:
 
-    1.  `<PackageName>_FOUND`:用于指示是否找到了包
-    2.  `<PackageName>_INCLUDE_DIRS`:用于包含头文件的路径
-    3.  `<PackageName>_LIBRARIES`:用于链接库的路径
-    4.  `<PackageName>_DEFINITIONS`:用于包含预定义宏的定义
-    5.  `<PackageName>_VERSION`:包的版本号
+1.  `<PackageName>_FOUND`:用于指示是否找到了包
+2.  `<PackageName>_INCLUDE_DIRS`:用于包含头文件的路径
+3.  `<PackageName>_LIBRARIES`:用于链接库的路径
+4.  `<PackageName>_DEFINITIONS`:用于包含预定义宏的定义
+5.  `<PackageName>_VERSION`:包的版本号
 
-    这些变量可以在 `CMakeLists.txt` 文件中使用,以便正确地包含头文件,链接库等.
+这些变量可以在 `CMakeLists.txt` 文件中使用,以便正确地包含头文件,链接库等.
 
 
 #### One More Thing {#one-more-thing}

@@ -215,7 +215,7 @@ link_directories(${LLVM_LIBRARY_DIRS})
 
 给项目中添加了上述 =CMakeLists.txt= 文件后,项目可以正常编译运行.
 
-**** find_package
+*** find_package
 
 =find_package()= 是 =cmake= 中的一个命令,用于在系统上查找已安装的软件包,并设置相关变量.这个命令主要用于在
  =cmake= 构建系统中引入第三方库。
