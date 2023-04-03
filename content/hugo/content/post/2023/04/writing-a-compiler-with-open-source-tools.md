@@ -1,7 +1,7 @@
 +++
 title = "使用flex, bison, llvm实现编译器"
 date = 2023-04-02T14:12:00+08:00
-lastmod = 2023-04-02T18:40:05+08:00
+lastmod = 2023-04-03T20:12:32+08:00
 tags = ["编译", "LLVM"]
 categories = ["编译", "LLVM"]
 draft = false
@@ -285,3 +285,42 @@ link_directories(${LLVM_LIBRARY_DIRS})
     在使用 `cmake` 构建项目时,我发现了一件奇怪的事情: `CMakeLists.txt` 文件中,只对 `Clang` 进行了 `find_package`,并没有对 `LLVM` 进行 `find_package`,在最后链接的时候,竟然能链接 `LLVM` 的库.
 
     我猜测是在 `find_package(Clang...)` 时, `Clang` 去执行了 `find_package(LLVM...)`,查看 `ClangConfig.cmake` 文件后,果然是这样.在 `${LLVM_DIR}/lib/cmake/clang/ClangConfig.cmake` 文件中,有一行 `find_package(LLVM REQUIRED CONFIG HINTS "${CLANG_INSTALL_PREFIX}/lib/cmake/llvm")`.
+
+
+### 适配 `LLVM 16.0.0` {#适配-llvm-16-dot-0-dot-0}
+
+
+#### 主要是CPP语法+LLVM接口 {#主要是cpp语法-plus-llvm接口}
+
+原始项目中,使用的是C++ 14的语法,但是 `LLVM 16.0.0` 使用了更新的C++标准,经过测试,C++ 20是可以编译通过的,所以我选择了C++20.
+
+原始版本使用的是 `LLVM 9.0.1_4` 的接口,迁移到 `LLVM 16.0.0` 后,只需要将编译无法通过的接口适配一下既可.
+
+
+#### 借鉴[Kaleidoscope](https://llvm.org/docs/tutorial/index.html)生成 `.o` 文件 {#借鉴-kaleidoscope-生成-dot-o-文件}
+
+原始项目产生的编译器会将源文件编译为 `BitCode` 文件,接着要么使用 `llc` 和 `clang` 将 `BitCode` 编译为可运行的二进制程序,要么使用 `lli` 解释执行 `BitCode` 文件.借鉴[Kaleidoscope第八章](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl08.html),我们其实可以直接生成 `.o` 文件,后续再想办法将 `.o` 文件链接为可执行的二进制程序.
+
+这一部分的代码直接参考了 `Kaleidoscope`,改动不是特别大.
+
+
+### 使用LLVM的一些Pass对代码进行优化 {#使用llvm的一些pass对代码进行优化}
+
+这一部分参考了[Kaleidoscope第四章](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html)的 `4.3. LLVM Optimization Passes` 一节,只需要在代码生成之后,使用 `Pass` 对代码进行优化,非常方便,同样代码改动不大.
+
+
+### 后续计划 {#后续计划}
+
+
+#### 完善语法 {#完善语法}
+
+1.  这个小项目目前还不支持分支等很多语法,需要陆续添加
+2.  借鉴[Kaleidoscope第四章](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html) `4.4. Adding a JIT Compiler` 一节的最后一部分,使用现有的C库扩充函数
+3.  加入一些函数式编程的语法
+4.  优化内存管理
+
+
+#### 完善编译器功能 {#完善编译器功能}
+
+1.  编译器目前只支持生成 `.o` 文件,之后需要支持生成可执行的二进制文件,能跨平台更好了
+2.  使用 `LLVM` 的 `JIT` 加入解释器的功能
