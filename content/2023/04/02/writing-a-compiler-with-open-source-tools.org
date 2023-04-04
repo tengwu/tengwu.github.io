@@ -272,9 +272,10 @@ link_directories(${LLVM_LIBRARY_DIRS})
 ** 后续计划
 *** 完善语法
 1. 这个小项目目前还不支持分支等很多语法,需要陆续添加
-2. 借鉴[[https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html][Kaleidoscope第四章]] =4.4. Adding a JIT Compiler= 一节的最后一部分,使用现有的C库扩充函数
-3. 加入一些函数式编程的语法
-4. 优化内存管理
+2. 需要支持类型系统
+3. 借鉴[[https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html][Kaleidoscope第四章]] =4.4. Adding a JIT Compiler= 一节的最后一部分,使用现有的C库扩充函数
+4. 加入一些函数式编程的语法
+5. 优化内存管理
 *** 完善编译器功能
 1. 编译器目前只支持生成 =.o= 文件,之后需要支持生成可执行的二进制文件,能跨平台更好了
 2. 使用 =LLVM= 的 =JIT= 加入解释器的功能

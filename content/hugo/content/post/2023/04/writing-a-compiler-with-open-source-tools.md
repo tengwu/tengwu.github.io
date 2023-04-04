@@ -1,7 +1,7 @@
 +++
 title = "使用flex, bison, llvm实现编译器"
 date = 2023-04-02T14:12:00+08:00
-lastmod = 2023-04-03T20:12:32+08:00
+lastmod = 2023-04-04T15:59:59+08:00
 tags = ["编译", "LLVM"]
 categories = ["编译", "LLVM"]
 draft = false
@@ -315,9 +315,10 @@ link_directories(${LLVM_LIBRARY_DIRS})
 #### 完善语法 {#完善语法}
 
 1.  这个小项目目前还不支持分支等很多语法,需要陆续添加
-2.  借鉴[Kaleidoscope第四章](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html) `4.4. Adding a JIT Compiler` 一节的最后一部分,使用现有的C库扩充函数
-3.  加入一些函数式编程的语法
-4.  优化内存管理
+2.  需要支持类型系统
+3.  借鉴[Kaleidoscope第四章](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html) `4.4. Adding a JIT Compiler` 一节的最后一部分,使用现有的C库扩充函数
+4.  加入一些函数式编程的语法
+5.  优化内存管理
 
 
 #### 完善编译器功能 {#完善编译器功能}
