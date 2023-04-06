@@ -34,7 +34,7 @@
    class NExternDeclaration
    class NFunctionDeclaration
    @enduml
-           #+END_SRC
+ #+END_SRC
 
 #+RESULTS:
 [[file:../../../../resources/_gen/images/arch_v0.png]]
