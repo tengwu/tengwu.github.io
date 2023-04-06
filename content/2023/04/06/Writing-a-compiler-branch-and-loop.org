@@ -1,0 +1,46 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../hugo
+#+HUGO_SECTION: post/2023/04
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-04-06 Thu 20:45]
+#+TITLE: 分支与循环
+#+HUGO_TAGS: 编译 LLVM
+#+HUGO_CATEGORIES: 编译 LLVM
+#+STARTUP: inlineimages
+
+* Clean code
+ =toy-compiler= 编译器目前的项目结构是这样的:
+ #+BEGIN_SRC plantuml :exports results :file ../../../../resources/_gen/images/arch_v0.png
+   @startuml
+   abstract class "Node"
+   abstract class "NExpression"
+   abstract class "NStatement"
+   class NInteger
+   class NDouble
+   class NIdentifier
+   class NInteger
+   class NMethodCall
+   class NBinaryOperator
+   class NAssignment
+   class NBlock
+   class NIFBlock
+   class NIFBlocks
+   class NBranchStatement
+   class NExpressionStatement
+   class NReturnStatement
+   class NVariableDeclaration
+   class NExternDeclaration
+   class NFunctionDeclaration
+   @enduml
+           #+END_SRC
+
+#+RESULTS:
+[[file:../../../../resources/_gen/images/arch_v0.png]]
+
+
+
+* 分支
+
+* 循环
