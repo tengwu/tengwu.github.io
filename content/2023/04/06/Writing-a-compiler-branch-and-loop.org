@@ -11,8 +11,9 @@
 #+STARTUP: inlineimages
 
 * Clean code
+
  =toy-compiler= 编译器目前的项目结构是这样的:
- #+BEGIN_SRC plantuml :exports results :file ../../../../resources/_gen/images/arch_v0.png
+ #+BEGIN_SRC plantuml :exports results :file ../../../hugo/static/images/arch_v0.png
    @startuml
    abstract class "Node"
    abstract class "NExpression"
@@ -37,8 +38,7 @@
  #+END_SRC
 
 #+RESULTS:
-[[file:../../../../resources/_gen/images/arch_v0.png]]
-
+[[file:../../../hugo/static/images/arch_v0.png]]
 
 
 * 分支
