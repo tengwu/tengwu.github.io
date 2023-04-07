@@ -34,6 +34,27 @@
    class NVariableDeclaration
    class NExternDeclaration
    class NFunctionDeclaration
+
+   Node <|-- NExpression
+   Node <|-- NStatement
+
+   NExpression <|-- NInteger
+   NExpression <|-- NDouble
+   NExpression <|-- NIdentifier
+   NExpression <|-- NMethodCall
+   NExpression <|-- NBinaryOperator
+   NExpression <|-- NAssignment
+   NExpression <|-- NBlock
+
+   NBlock <|-- NIFBlock
+   NBlock <|-- NIFBlocks
+
+   NStatement <|-- NBranchStatement
+   NStatement <|-- NExpressionStatement
+   NStatement <|-- NReturnStatement
+   NStatement <|-- NVariableDeclaration
+   NStatement <|-- NExternDeclaration
+   NStatement <|-- NFunctionDeclaration
    @enduml
  #+END_SRC
 
