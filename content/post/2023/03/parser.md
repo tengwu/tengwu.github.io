@@ -1,7 +1,7 @@
 +++
 title = "语法分析"
 date = 2023-03-28T18:32:00+08:00
-lastmod = 2023-03-29T11:33:46+08:00
+lastmod = 2023-04-07T12:54:48+08:00
 tags = ["CS143", "编译"]
 categories = ["编译"]
 draft = false
@@ -36,6 +36,7 @@ toc = true
 
 #### 使用 `bison` {#使用-bison}
 
+[手册1.8节](https://www.gnu.org/software/bison/manual/html_node/Stages.html)提供了使用 `bison` 的一般步骤.
 使用 `bison` 生成语法分析器的基本步骤与使用 `flex` 非常类似,具体步骤如下:
 
 1.  编写语法规则文件,将要分析的程序语言语法描述出来
@@ -83,6 +84,8 @@ toc = true
     }
     ```
     其中,%{ 和 %} 之间的代码是在解析器中使用的C代码,%token 定义了词法分析器生成的符号类型,%left 和 %precedence 定义了运算符的优先级和结合性.%% 之间的是具体的语法规则,这里定义了 expression 表达式的语法规则,包括数字,加减乘除和取负操作.最后, main 函数调用 yyparse() 函数开始解析表达式, yyerror 和 yywrap 分别用于处理错误和结束解析器的工作.
+
+    除了上述这个例子,手册中也给出了一个逆波兰表达式计算器的语法分析器示例,详见[手册第2章](https://www.gnu.org/software/bison/manual/html_node/Examples.html).
 2.  使用 `bison` 编译语法规则文件,生成解析器的源代码和头文件:
     ```sh
     $ bison -d calc.y
@@ -98,6 +101,18 @@ toc = true
     ```sh
     $ ./calc
     ```
+
+
+#### 使用 `bison` 描述 `CFG` {#使用-bison-描述-cfg}
+
+使用 `bison` 描述 `CFG` 有一些细节需要注意:
+
+1.  使用小写字母来表示非终结符,比如 `expr`, `stmt` 等,当然这只是一种约定.
+2.  使用大写字母来表示终结符,比如 `INTEGER`, `IF` 等,当然这也是一种约定.另外, `bison` 中的终结符被称为 `token kind` .一个终结符代表了一门语言中的特定的关键字.
+
+    `error` 由小写字母组成,但是是一个特殊的终结符.
+3.  也可以使用类似C语言中的字符常量来表示一个终结符,比如 `'c'` 表示字符 `c` 是一个终结符.
+4.  也可以使用类似C语言中的字符串常量来表示一个终结符,比如 `"string"` 表示字符串 `string` 是一个终结符.
 
 
 ### ~~一些形式化的概念~~ {#bd3e87}

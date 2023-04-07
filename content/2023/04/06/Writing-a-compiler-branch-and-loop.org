@@ -1,5 +1,5 @@
 #+OPTIONS: author:nil ^:{}
-#+HUGO_BASE_DIR: ../../../hugo
+#+HUGO_BASE_DIR: ../../../..
 #+HUGO_SECTION: post/2023/04
 #+HUGO_CUSTOM_FRONT_MATTER: :toc true
 #+HUGO_AUTO_SET_LASTMOD: t
@@ -13,7 +13,7 @@
 * Clean code
 
  =toy-compiler= 编译器目前的项目结构是这样的:
- #+BEGIN_SRC plantuml :exports results :file ../../../hugo/static/images/arch_v0.png
+ #+BEGIN_SRC plantuml :exports results :file ../../../../static/images/arch_v0.png
    @startuml
    abstract class "Node"
    abstract class "NExpression"
@@ -58,8 +58,7 @@
    @enduml
  #+END_SRC
 
-#+RESULTS:
-[[file:../../../hugo/static/images/arch_v0.png]]
+ [[file:/images/arch_v0.png]]
 
 
 * 分支

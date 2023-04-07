@@ -11,9 +11,6 @@ buildExpired: false
 
 googleAnalytics: UA-123-45
 
-staticDir:
-- content/hugo/static
-
 minify:
   disableXML: true
   minifyOutput: true

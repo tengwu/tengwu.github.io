@@ -1,5 +1,5 @@
 #+OPTIONS: author:nil ^:{}
-#+HUGO_BASE_DIR: ../../../hugo
+#+HUGO_BASE_DIR: ../../../..
 #+HUGO_SECTION: post/2023/03
 #+HUGO_CUSTOM_FRONT_MATTER: :toc true
 #+HUGO_AUTO_SET_LASTMOD: t
