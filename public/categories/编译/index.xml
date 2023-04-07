@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>编译 on me</title>
+    <link>http://tengwu.quest/categories/%E7%BC%96%E8%AF%91/</link>
+    <description>Recent content in 编译 on me</description>
+    <image>
+      <title>me</title>
+      <url>http://tengwu.quest/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://tengwu.quest/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 06 Apr 2023 20:45:00 +0800</lastBuildDate><atom:link href="http://tengwu.quest/categories/%E7%BC%96%E8%AF%91/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>分支与循环</title>
+      <link>http://tengwu.quest/post/2023/04/writing-a-compiler-branch-and-loop/</link>
+      <pubDate>Thu, 06 Apr 2023 20:45:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/04/writing-a-compiler-branch-and-loop/</guid>
+      <description>Clean code toy-compiler 编译器目前的项目结构是这样的:
+分支 循环 </description>
+    </item>
+    
+    <item>
+      <title>使用flex, bison, llvm实现编译器</title>
+      <link>http://tengwu.quest/post/2023/04/writing-a-compiler-with-open-source-tools/</link>
+      <pubDate>Sun, 02 Apr 2023 14:12:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/04/writing-a-compiler-with-open-source-tools/</guid>
+      <description>2023年实现编译器竟然如此简单 这周跟着LLVM官方教程学习了一下 LLVM 的基础知识,实现了一个可以跑起来的编译器,当然其实就是把人家提供的代码稍微改一改,不理解的地方单步跟着调一下.
+抱着学习 LLVM 的目的,周末突然产生了用 flex, bison, LLVM 实现一个编译器的想法,网上搜索了一下,十几年前就有人这样做了,索性就直接跟着别人的博客学习一下.还是先把别人的代码跑起来,读代码,不懂的地方单步跟一下,如果有什么想法的话,再把别人的代码魔改一下.
+参考 https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/ 动手写个玩具编译器 链接2 参考了 链接1, 链接1 是2009年写的一篇博客,基于 LLVM 2.6, 链接2 是2020年写的一篇博客,基于更高版本的 LLVM (经过测试, LLVM 9.0.1_4 可以编译通过). 现在是2023年4月2日, LLVM 稳定版本是16.0.0,也许我可以试着把 链接2 的代码改一改,适配 LLVM 16.0.0. 代码适配 LLVM 16.0.0 项目构建 将已有的代码编译通过 LLVM 每一个版本的接口都有很大的不同,每个版本使用的C++标准甚至都有差别,为了将已有代码编译通过,需要使用合适的C++标准和 LLVM 版本.
+经测试,原始代码使用的C++标准是14, LLVM 版本为 LLVM 9.0.1_4.在 macOS 13.2.1 上,可以通过 brew install llvm@9 来安装这个版本的 LLVM,在安装结束后, brew 会输出安装位置(在这个目录下有 bin, lib, include 等常见目录),在本文中,我们将这个位置称为 LLVM_DIR.例如,在我的系统上, LLVM_DIR 为 /usr/local/Cellar/llvm@9/9.0.1_4.
+原始代码中的 Makefile 文件使用 llvm-config 来设置头文件目录和库搜索目录:</description>
+    </item>
+    
+    <item>
+      <title>语法分析</title>
+      <link>http://tengwu.quest/post/2023/03/parser/</link>
+      <pubDate>Tue, 28 Mar 2023 18:32:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/03/parser/</guid>
+      <description>语法分析简介 语法分析的任务 语法分析是编译器继词法分析之后的一个重要步骤,主要任务是将输入的源代码转换为语法分析树或者抽象语法树,以便后续的语义分析,中间代码生成和优化等处理.
+具体来说,语法分析的任务包括以下几个方面:
+识别输入的源代码中是否存在语法错误,即判断输入的源代码是否符合给定的文法规则.如果存在语法错误,语法分析器将报告相应的错误信息. 将输入的源代码转换为语法分析树或者抽象语法树.语法分析树是一个表示源代码语法结构的树形结构,每个节点代表源代码中的一个语法成分,如语句,表达式,运算符等.抽象语法树则是一种去除冗余信息后的语法树,只保留程序的语义信息,用于后续的代码生成和优化. 为每个节点附加语义信息,如数据类型,变量名,函数名等.这些信息将在后续的语义分析和代码生成中用到. 生成错误信息和警告信息,以便提示开发者对源代码进行改正. 强大的语法分析生成器 bison bison 是 flex 的亲密战友,它是一种强大的语法分析器生成器,可以根据用户提供的上下文无关文法生成相应的语法分析器.
+bison 可以通过读取用户提供的语法规则,生成相应的语法分析器,从而将源代码转换为语法分析树或者抽象语法树,并对语法错误进行报告.
+同时, bison 还提供了丰富的选项和功能,如语法冲突检查,语法错误处理,语法树的生成和遍历等,方便开发者进行灵活的配置和使用.
+bison 的语法规则基于类似于 BNF 的范式,可以包含终结符和非终结符,以及相应的语义动作.它使用 LALR(1) 分析算法,能够高效地处理大规模的语法规则和输入流,同时还提供了一些高级特性,如词法和语法错误处理,优先级和关联性规则,语法树生成和遍历等.
+使用 bison 手册1.8节提供了使用 bison 的一般步骤. 使用 bison 生成语法分析器的基本步骤与使用 flex 非常类似,具体步骤如下:
+编写语法规则文件,将要分析的程序语言语法描述出来 使用 bison 编译语法规则文件,生成C文件 编译链接这些C文件成一个二进制程序 运行二进制程序,进行语法分析 下面以分析计算器的语法为例,说明一下这四个步骤:
+编写语法规则文件（通常使用扩展名为 .y 的文件）,定义计算器的语法规则.以下是一个简单的例子:
+%{ #include &amp;lt;stdio.h&amp;gt; %} %token NUMBER %left &amp;#39;+&amp;#39; &amp;#39;-&amp;#39; %left &amp;#39;*&amp;#39; &amp;#39;/&amp;#39; %precedence UMINUS %% expression: NUMBER | expression &amp;#39;+&amp;#39; expression | expression &amp;#39;-&amp;#39; expression | expression &amp;#39;*&amp;#39; expression | expression &amp;#39;/&amp;#39; expression | &amp;#39;-&amp;#39; expression %prec UMINUS ; %% int main() { yyparse(); return 0; } int yyerror(char const *msg) { fprintf(stderr, &amp;#34;Error: %s\n&amp;#34;, msg); return 0; } int yywrap() { return 1; } 其中,%{ 和 %} 之间的代码是在解析器中使用的C代码,%token 定义了词法分析器生成的符号类型,%left 和 %precedence 定义了运算符的优先级和结合性.</description>
+    </item>
+    
+    <item>
+      <title>词法分析</title>
+      <link>http://tengwu.quest/post/2023/03/lexer/</link>
+      <pubDate>Tue, 28 Mar 2023 15:27:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/03/lexer/</guid>
+      <description>词法分析 简介 词法分析是编译原理中的一个重要步骤，它是将源代码中的字符序列（如程序、脚本等）分解成一系列的单词或词素（ Token ）的过程。 Token 是编程语言中的最小单元，它可以是关键字、标识符、运算符、常量或分隔符等。
+词法分析器（ Lexer ）会读入源代码字符序列，扫描每个字符，并根据语法规则将字符序列分割成 Token 序列，然后将这些 Token 保存下来，交给下一步的语法分析器（ Parser ）进行分析和处理。
+在词法分析的过程中，词法分析器通常会忽略空格、换行符等无关字符，只识别有效的 Token ，并为每个 Token 打上相应的类型标记。例如，对于C语言中的表达式 x\=y+3 ，词法分析器会识别出标识符 x 、 y 、 + 、 \= 和数字 3 ，并将它们分别打上相应的类型标记，以便后续的语法分析和代码生成。
+词法分析算法 本节参考了&amp;quot;编译器设计 第二版&amp;quot;
+主要包含从正则表达式构造 NFA ，从 NFA 到 DFA 的子集构造算法， NFA 模拟算法，最小化 DFA 的算法。
+TODO
+flex 使用的词法分析算法 flex 使用的词法分析算法是基于有限状态自动机 （Finite State Automaton，FSA） 的算法。它将用户定义的正则表达式转换成一个 DFA（Deterministic Finite Automaton，确定性有限状态自动机） ，然后通过扫描输入的字符序列，并根据 DFA 的状态转移规则逐个读入字符，最终得到 Token 序列。
+flex 生成的词法分析器中包含一个状态转移表，该表包含了所有的状态和状态转移规则。每个状态对应一个状态号，每个字符对应一个字符类，状态转移表中的每个条目记录了当前状态、字符类和下一个状态。在扫描输入字符序列时，词法分析器会根据当前状态和读入的字符，查找状态转移表，找到下一个状态，并执行相应的动作，例如记录 Token 类型、值等。
+flex 使用 FSA 算法的优点是速度快，生成的词法分析器代码比较紧凑，并且可以自动生成状态转移表，无需手动设计状态转移规则。缺点是在处理一些上下文相关的语言时，可能会出现识别错误的情况。</description>
+    </item>
+    
+    <item>
+      <title>CS143 PA1</title>
+      <link>http://tengwu.quest/post/2023/03/cs143-pa1/</link>
+      <pubDate>Tue, 28 Mar 2023 14:01:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/03/cs143-pa1/</guid>
+      <description>Lexer 整体项目结构 宏观的目录结构如下：
+$ tree cs143 -L 1 cs143 ├── assignments ├── bin ├── etc ├── examples ├── handouts ├── include ├── lib └── src cs143 目录包含了所有实验所需的文件，其中：
+include 目录包含了实验所需头文件 assignments 目录包含了所有实验所需的源文件，实验过程中只需要修改 assignments 目录下的源文件就可以了 bin 目录包含了部分实验所需的二进制文件，比如 MIPS 模拟器 spim 等 etc 目录包含了一个名为 link-object 的二进制程序 examples 目录包含了一些 cool 语言写的代码示例 handouts 目录包含了实验手册 lib 目录包含了一些 java 的库文件，如果选择使用 C++ 来做实验，可以忽略这个目录 src 目录包含了实验中所有用到的源文件以及一些二进制文件，不太明白这个目录的意义，但是应该可以忽略 assigments 目录结构如下所示：
+$ tree assigments assigments ├── PA1 │ ├── Makefile │ ├── README │ ├── atoi.</description>
+    </item>
+    
+  </channel>
+</rss>

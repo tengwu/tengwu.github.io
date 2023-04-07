@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>LLVM on me</title>
+    <link>http://tengwu.quest/categories/llvm/</link>
+    <description>Recent content in LLVM on me</description>
+    <image>
+      <title>me</title>
+      <url>http://tengwu.quest/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://tengwu.quest/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 06 Apr 2023 20:45:00 +0800</lastBuildDate><atom:link href="http://tengwu.quest/categories/llvm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>分支与循环</title>
+      <link>http://tengwu.quest/post/2023/04/writing-a-compiler-branch-and-loop/</link>
+      <pubDate>Thu, 06 Apr 2023 20:45:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/04/writing-a-compiler-branch-and-loop/</guid>
+      <description>Clean code toy-compiler 编译器目前的项目结构是这样的:
+分支 循环 </description>
+    </item>
+    
+    <item>
+      <title>使用flex, bison, llvm实现编译器</title>
+      <link>http://tengwu.quest/post/2023/04/writing-a-compiler-with-open-source-tools/</link>
+      <pubDate>Sun, 02 Apr 2023 14:12:00 +0800</pubDate>
+      
+      <guid>http://tengwu.quest/post/2023/04/writing-a-compiler-with-open-source-tools/</guid>
+      <description>2023年实现编译器竟然如此简单 这周跟着LLVM官方教程学习了一下 LLVM 的基础知识,实现了一个可以跑起来的编译器,当然其实就是把人家提供的代码稍微改一改,不理解的地方单步跟着调一下.
+抱着学习 LLVM 的目的,周末突然产生了用 flex, bison, LLVM 实现一个编译器的想法,网上搜索了一下,十几年前就有人这样做了,索性就直接跟着别人的博客学习一下.还是先把别人的代码跑起来,读代码,不懂的地方单步跟一下,如果有什么想法的话,再把别人的代码魔改一下.
+参考 https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/ 动手写个玩具编译器 链接2 参考了 链接1, 链接1 是2009年写的一篇博客,基于 LLVM 2.6, 链接2 是2020年写的一篇博客,基于更高版本的 LLVM (经过测试, LLVM 9.0.1_4 可以编译通过). 现在是2023年4月2日, LLVM 稳定版本是16.0.0,也许我可以试着把 链接2 的代码改一改,适配 LLVM 16.0.0. 代码适配 LLVM 16.0.0 项目构建 将已有的代码编译通过 LLVM 每一个版本的接口都有很大的不同,每个版本使用的C++标准甚至都有差别,为了将已有代码编译通过,需要使用合适的C++标准和 LLVM 版本.
+经测试,原始代码使用的C++标准是14, LLVM 版本为 LLVM 9.0.1_4.在 macOS 13.2.1 上,可以通过 brew install llvm@9 来安装这个版本的 LLVM,在安装结束后, brew 会输出安装位置(在这个目录下有 bin, lib, include 等常见目录),在本文中,我们将这个位置称为 LLVM_DIR.例如,在我的系统上, LLVM_DIR 为 /usr/local/Cellar/llvm@9/9.0.1_4.
+原始代码中的 Makefile 文件使用 llvm-config 来设置头文件目录和库搜索目录:</description>
+    </item>
+    
+  </channel>
+</rss>
