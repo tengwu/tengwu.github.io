@@ -28,7 +28,6 @@
    class NBlock
    class NIFBlock
    class NIFBlocks
-   class NBranchStatement
    class NExpressionStatement
    class NReturnStatement
    class NVariableDeclaration
@@ -49,7 +48,6 @@
    NBlock <|-- NIFBlock
    NBlock <|-- NIFBlocks
 
-   NStatement <|-- NBranchStatement
    NStatement <|-- NExpressionStatement
    NStatement <|-- NReturnStatement
    NStatement <|-- NVariableDeclaration
@@ -61,10 +59,171 @@
  [[file:/images/arch_v0.png]]
 
 * 分支
- 为了实现分支语句,我们创建一个新的 =NBranchStatement= 类,这个类继承自 =NStatement= 类.每一条分支语句( =NBranchStatement= )对象应该包含若干个 =if= 语句块( =NIFBlock= )和至多一个 =else= 语句块( =NBlock= ).而每个 =NIFBlock= 中应包含一个条件表达式( =NExpression= )和一个基本语句块( =NBlock= ).
+为了实现分支语句,我们创建一个新的 =NBranchStatement= 类,这个类继承自 =NStatement= 类.每一条分支语句( =NBranchStatement= )对象应该包含若干个 =if= 语句块( =NIFBlock= )和至多一个 =else= 语句块( =NBlock= ).而每个 =NIFBlock= 中应包含一个条件表达式( =NExpression= )和一个基本语句块( =NBlock= ,  .
 
- 到这里,可以发现上述项目结构至少存在一个问题: =NIFBlock= 和 =NBlock= 不应该是继承关系而应该是组合关系.
+=NBranchStatement= 的结构如下:
+#+BEGIN_SRC c++
+  class NIFBlock : public NBlock {
+  public:
+    NExpression &condExpr;
 
- 所以将代码中涉及到 =NIFBlock= 的类进行改进.修改后的类图如下: +稍后放送...+.
+    NIFBlock(NExpression &condition, NBlock &block) : condExpr(condition) {
+      // 这里可以优化
+      statements = block.statements;
+    }
+  };
+
+  class NIFBlocks : public NBlock {
+  public:
+    IFBlockList IFBlocks;
+
+    NIFBlocks() {}
+    IFBlockList &getIFBlocks() { return IFBlocks; };
+  };
+
+  class NBranchStatement : public NStatement {
+  public:
+    IFBlockList &IFBlocks;
+    NBlock *ElseBlock;
+
+    NBranchStatement(IFBlockList &ifBlocks, NBlock *elseBlock): IFBlocks(ifBlocks), ElseBlock(elseBlock) {};
+
+    void setIFBlocks(IFBlockList &ifBlocks);
+    void setElseBlock(NBlock *elseBlock);
+    llvm::Value *codeGen(CodeGenContext &context) override;
+  };
+#+END_SRC
+
+因为 =NIFBlock= 继承自 =NBlock=,本身就含有一个语句列表 =StatementList=,所以不需要再添加新的语句列表; =NIFBlock::codeGen= 函数 *不重写* 父类的 =codeGen=,这样 =NIFBlock::codeGen= 能直接生成 =if= 分支的代码.
+
+接下来需要实现 =NBranchStatement::codeGen= 函数,主要参考了[[https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl05.html][手册第5章]]的内容:
+
+考虑只有 =if-then-else= 的情况,需要一段比较条件表达式值的代码和三个基本块(=then= 基本块和 =else基本块= , =merge基本块= ), =merge基本块= 是 =else基本块= 和 =then基本块= 的交汇点,也就是说,这两个基本块的最后一条语句都是跳转到 =merge= 基本块执行.如果条件表达式的值不为0,也就是 =true=,就跳转到 =then基本块= 执行,如果条件表达式的值为0,也就是 =false=,就跳转到 =else基本块= 执行.
+
+如果加入 =elseif= 的情况,其实也非常直观:如果前一个 =if= 语句或者 =elseif= 语句条件成立,则跳转到对应的 =then基本块= 执行,否则跳转到下一个 =elseif= 条件表达式处(实际上代码中将条件表达式单独放到一个基本块中)或者最后的 =else基本块= 处执行(如果没有 =else= 基本块,就直接跳到最后的 =merge基本块= 处执行).
+
+举个例子来说,对于下面的分支语句:
+#+BEGIN_SRC c
+int a = 1
+int b = 0
+if (a) {
+    echo(1) {
+else if (b) {
+    echo(2)
+}
+else {
+    echo(3)
+}
+#+END_SRC
+
+生成的 =IR= 为:
+#+BEGIN_SRC asm
+    %0 = load i64, ptr %a, align 4
+    %ifcond = icmp eq i64 %0, 0
+    br i1 %ifcond, label %if, label %then
+
+  then:                                             ; preds = %entry
+    call void @echo(i64 1)
+    br label %merge
+
+  if:                                               ; preds = %entry
+    %1 = load i64, ptr %b, align 4
+    %ifcond1 = icmp eq i64 %1, 0
+    br i1 %ifcond1, label %else, label %then2
+
+  then2:                                            ; preds = %if
+    call void @echo(i64 2)
+    br label %merge
+
+  else:                                             ; preds = %if
+    call void @echo(i64 3)
+    br label %merge
+
+  merge:                                            ; preds = %else, %then2, %then
+    ret i32 0
+#+END_SRC
+
+分支语句的类图如下:
+#+BEGIN_SRC plantuml :exports results :file ../../../../static/images/branch-statement.png
+  @startuml
+  abstract class NStatement
+  class NBlock
+  class NIFBlock
+  class NBranchStatement
+  NStatement <|-- NBranchStatement
+  NBlock <|-- NIFBlock
+
+  NBlock : codeGen()
+  NBlock : StatementList statements
+
+  NIFBlock : NExpression condExpr
+
+  NBranchStatement : vector<NIFBlock> IFBlocks
+  NBranchStatement : NBlock ThenBlock
+
+  NBranchStatement "1" *-- "*" NIFBlock
+  NBranchStatement "1" *-- "1" NBlock
+  @enduml
+#+END_SRC
+
+[[file:/images/branch-statement.png]]
 
 * 循环
+之后想实现类似 =Python= 中的 =for= 循环,这就需要先了解一下 =Python= 的实现,然后再做设计.
+
+本节只实现普通的 =while= 循环.
+
+为了实现 =while= 语句,我们创建一个新的 =NWhileStatement= 类,这个类继承自 =NStatement= 类.一个 =while= 语句的结构和只有一个if分支语句的结构是类似的,包含一个条件表达式和两个基本块( =then= 基本块和 =merge= 基本块).
+
+=while= 循环的实现和 =if= 语句类似,先生成条件表达式,如果条件表达式的值为 =true=,则执行 =while= 语句块的代码,否则,跳转到 =merge基本块= 执行.
+
+举个例子来说,对于下面的分支语句:
+#+BEGIN_SRC c
+  int a = 2
+  while (a) {
+      echo(1)
+      a = a - 1
+  }
+#+END_SRC
+
+生成的 =IR= 为:
+#+BEGIN_SRC asm
+    br label %whilecond
+
+  whilecond:                                        ; preds = %then, %entry
+    %0 = load i64, ptr %a, align 4
+    %whilecond1 = icmp eq i64 %0, 0
+    br i1 %whilecond1, label %merge, label %then
+
+  then:                                             ; preds = %whilecond
+    call void @echo(i64 1)
+    %1 = load i64, ptr %a, align 4
+    %subtmp = sub i64 %1, 1
+    store i64 %subtmp, ptr %a, align 4
+    br label %whilecond
+
+  merge:                                            ; preds = %whilecond
+    ret i32 0
+#+END_SRC
+
+
+循环语句的类图如下:
+#+BEGIN_SRC plantuml :exports results :file ../../../../static/images/while-statement.png
+  @startuml
+  abstract class NStatement
+  class NBlock
+  class NWhileStatement
+  NStatement <|-- NWhileStatement
+
+  NBlock : codeGen()
+  NBlock : StatementList statements
+
+  NWhileStatement "1" *-- "1" NBlock
+  NWhileStatement : NExpression condExpr
+  NWhileStatement : NBlock ThenBlock
+  @enduml
+#+END_SRC
+
+[[file:/images/while-statement.png]]
+
+本文涉及的代码详见[[https://github.com/tengwu/toy-compiler][github]].
