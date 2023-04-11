@@ -1,0 +1,21 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/04
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-04-11 Tue 21:11]
+#+TITLE: 实现静态链接器
+#+HUGO_TAGS: 编译
+#+HUGO_CATEGORIES: 编译
+#+STARTUP: inlineimages
+
+* Overview
+
+* 理解ELF
+
+** 符号解析
+
+* 重定位
+
+* 生成可执行文件
