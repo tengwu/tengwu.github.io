@@ -1,7 +1,7 @@
 +++
 title = "实现静态链接器"
 date = 2023-04-11T21:11:00+08:00
-lastmod = 2023-04-12T21:02:26+08:00
+lastmod = 2023-04-12T21:09:33+08:00
 tags = ["编译"]
 categories = ["编译"]
 draft = false
@@ -331,10 +331,7 @@ Relocation section '.rela.eh_frame' at offset 0x260 contains 1 entry:
 指定保留用于应用程序的索引范围的上界.应用程序可以使用 `SHT_LOUSER` 和 `SHT_HIUSER` 之间的节类型,而不会与当前或将来系统定义的节类型产生冲突.
 
 
-## ELF Segments {#elf-segments}
-
-
-## 符号解析 {#符号解析}
+## 程序加载 {#程序加载}
 
 
 ## 重定位 {#重定位}

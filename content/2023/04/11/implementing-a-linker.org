@@ -338,9 +338,7 @@ This value specifies the upper bound of the range of indexes reserved for applic
 
 
 
-* ELF Segments
-
-* 符号解析
+* 程序加载
 
 * 重定位
 
