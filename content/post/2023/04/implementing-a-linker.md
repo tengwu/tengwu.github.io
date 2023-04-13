@@ -1,15 +1,12 @@
 +++
 title = "实现静态链接器"
 date = 2023-04-11T21:11:00+08:00
-lastmod = 2023-04-12T21:09:33+08:00
+lastmod = 2023-04-13T16:59:18+08:00
 tags = ["编译"]
 categories = ["编译"]
 draft = false
 toc = true
 +++
-
-## Overview {#overview}
-
 
 ## ELF Overview {#elf-overview}
 
@@ -331,13 +328,32 @@ Relocation section '.rela.eh_frame' at offset 0x260 contains 1 entry:
 指定保留用于应用程序的索引范围的上界.应用程序可以使用 `SHT_LOUSER` 和 `SHT_HIUSER` 之间的节类型,而不会与当前或将来系统定义的节类型产生冲突.
 
 
-## 程序加载 {#程序加载}
+## 实现链接器 {#实现链接器}
+
+既然文章标题是 **实现链接器**,那就得真写代码来实现一个链接器.
 
 
-## 重定位 {#重定位}
+### Overview {#overview}
+
+链接器主要做的事情是解析未定义的符号引用,将目标文件中的占位符替换为符号的地址.有了上一节对 `ELF` 格式的介绍,实现一个链接器应该主要聚焦在重定位表,符号表还有program header table.
+
+说干就干.
 
 
-## 生成可执行文件 {#生成可执行文件}
+### 数据结构 {#数据结构}
+
+首先从现成的链接器中偷一个数据结构定义来.我直接用了 `LLVM 16.0.0` 的 `elf.h`.稍微修改一下其中的某些内容,去除对 `llvm/ADT/StringRef.h` 的依赖.我们的目标平台是 `x86-64`.
+
+其中,关键的数据结构如下表所示:
+
+| 数据结构名称 | 意义                                     |
+|--------|----------------------------------------|
+| Elf64_Ehdr | ELF header                               |
+| Elf64_Phdr | program header table entry               |
+| Elf64_Chdr | section header table entry               |
+| Elf64_Sym  | symbol table entry                       |
+| Elf64_Rela | relocation entry with explicit addend    |
+| Elf64_Rel  | relocation entry without explicit addend |
 
 
 ## 一些问题 {#一些问题}
