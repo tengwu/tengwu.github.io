@@ -1,7 +1,7 @@
 +++
 title = "使用flex, bison, llvm实现编译器"
 date = 2023-04-02T14:12:00+08:00
-lastmod = 2023-04-07T12:56:07+08:00
+lastmod = 2023-04-17T18:12:45+08:00
 tags = ["编译", "LLVM"]
 categories = ["编译", "LLVM"]
 draft = false
@@ -239,13 +239,16 @@ link_directories(${LLVM_LIBRARY_DIRS})
 `find_package()` 是 `cmake` 中的一个命令,用于在系统上查找已安装的软件包,并设置相关变量.这个命令主要用于在
  `cmake` 构建系统中引入第三方库。
 
-当使用 `find_package()` 命令查找软件包时, `cmake` 会在系统路径下查找该软件包，并设置相关变量,例如该软件包的头文件路径,库文件路径,链接库等信息.一旦成功找到软件包,就可以将其与项目链接起来,使您的项目能够使用该软件包提供的功能.
+当使用 `find_package()` 命令查找软件包时, `cmake` 会在系统路径下查找该软件包，并设置相关变量,例如该软件包
+的头文件路径,库文件路径,链接库等信息.一旦成功找到软件包,就可以将其与项目链接起来,使您的项目能够使用该软件
+包提供的功能.
 
 通常，使用 `find_package()` 命令需要执行以下步骤：
 
 1.  在 `CMakeLists.txt` 文件中加入 `find_package()` 命令，例如： `find_package(PackageName REQUIRED)`,这里
 
-的 `PackageName` 是要查找的软件包名称,如果该软件包不存在或未安装, `cmake` 将会在输出中报告错误.如果软件包存在, `cmake` 会设置相关变量,例如包含路径,库文件路径等
+的 `PackageName` 是要查找的软件包名称,如果该软件包不存在或未安装, `cmake` 将会在输出中报告错误.如果软件包
+存在, `cmake` 会设置相关变量,例如包含路径,库文件路径等
 
 1.  在 `CMakeLists.txt` 文件中使用 `include_directories()` 命令或 `target_include_directories()` 命令将包&gt;含路径添加到项目中
 2.  使用 `add_library()` 或 `add_executable()` 命令将源文件与该软件包链接起来,例如:
@@ -320,5 +323,62 @@ link_directories(${LLVM_LIBRARY_DIRS})
 
 #### 完善编译器功能 {#完善编译器功能}
 
-1.  编译器目前只支持生成 `.o` 文件,之后需要支持生成可执行的二进制文件,能跨平台更好了
-2.  使用 `LLVM` 的 `JIT` 加入解释器的功能
+1.  ~~编译器目前只支持生成 `.o` 文件,之后需要支持生成可执行的二进制文件,能跨平台更好了~~
+    事实上,这个功能是由链接器提供的,不过一般的编译器前端(本文也只是通过 `flex` 和 `bison` 实现了一个编译器前端)会调用 `LLVM lld` 的接口,来将生成的目标文件链接为可执行文件.
+
+    例如,只需要将如下代码加在生成目标文件的代码之后,就可以将目标文件和标准库一起链接为一个二进制程序:
+    ```cpp
+    const char *must_args[] = {
+      "-demangle",
+      "-lto_library",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/"
+      "XcodeDefault.xctoolchain/usr/lib/libLTO.dylib",
+      "-no_deduplicate",
+      "-dynamic",
+      "-arch",
+      "x86_64",
+      "-platform_version",
+      "macos",
+      "13.0.0",
+      "13.1",
+      "-syslibroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/"
+      "Developer/SDKs/MacOSX.sdk",
+      "-o",
+      "a.out",
+      "-L/usr/local/lib",
+      "-lSystem",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/"
+      "XcodeDefault.xctoolchain/usr/lib/clang/14.0.0/lib/darwin/"
+      "libclang_rt.osx.a"
+    };
+    std::vector<const char *> args;
+    args.push_back("placeholder");
+    for (auto arg: must_args) {
+      args.push_back(arg);
+     }
+    args.push_back("path/to/file1");
+    args.push_back("path/to/file2");
+    // ...
+    return lld::macho::link(args, llvm::outs(), llvm::errs(), false, false);
+    ```
+    **如何获取参数列表**:
+    调用 `lld::ARCH::link` 最重要的步骤就是获取参数列表 `args`,我是通过实现了一个链接器桩来获取到这些参数,当然这些参数也不确保对所有的代码都适用.链接器桩代码如下:
+    ```cpp
+    #include <stdio.h>
+
+    int main(int argc, char **argv) {
+      for (int i = 0; i < argc; i++) {
+        printf("%s\n", argv[i]);
+      }
+
+      return 0;
+    }
+    ```
+    这段代码只是把所有的参数打印出来,将这段代码编译为 `myld`,接着在使用 `clang` 或者 `gcc` 编译代码时,只要添加 `-fuse-ld=/path/to/myld` 参数,就能将编译器传递给链接器的所有参数打印出来.
+
+    以上的参数列表只针对 `macOS` 平台,在不同平台上编译不同文件时, `clang` 或者 `gcc` 生成的参数列表可能都是不一样的,具体是如何获取这些参数的,就得看 `clang` 的实现了.
+
+    关于跨平台的写法,可以参考 `LLVM源码` 中的 `lld/tools/lld/lld.cpp` 文件,这个工具的作用就是调用 `LLVM` 的链接器接口实现 `lld` 这个链接器.
+
+2.  ~~使用 `LLVM` 的 `JIT` 加入解释器的功能~~ 因为还有更重要的事情,这条搁浅了
