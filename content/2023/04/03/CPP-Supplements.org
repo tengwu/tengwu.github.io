@@ -111,6 +111,10 @@ C++11是C++的第二个主要版本,第一个主要版本是C++98.从C++11开始
 
 
 
+** TODO function
+
+** TODO constexpr
+
 * C++14
 ** TODO variadic templates
 可变参数模板.

@@ -1,0 +1,29 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/04
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-04-23 Sun 15:38]
+#+TITLE: 有关vivado的一些笔记
+#+HUGO_TAGS: FPGA vivado
+#+HUGO_CATEGORIES: FPGA
+#+STARTUP: inlineimages
+
+凌乱笔记,请博主稍后整理.
+
+* 使用chisel+vivado开发的workflow是什么样子的?
+使用 =chisel= 写 =RTL= 代码,然后生成 =verilog= 代码,再写 =verilator= 代码进行模拟,模拟通过后通过 =Vivado= 的workflow生成 =.bit= 文件,再通过别的工具把 =.bit= 文件烧到 =FPGA= 开发板上进行测试.
+
+* TODO 上板后如何进行调试?
+
+* 如何在服务器上用vivado进行仿真与综合?
+vivado提供了GUI模式和TCL(Tool Command Language)模式,TCL模式像是python的解释器,允许用户使用命令行来进行各种操作,比如创建工程,添加文件,执行综合和实现等等.TCL提供了丰富的命令和API供用户使用.
+
+除了上述两种模式,vivado还提供了batch模式,这是一种非交互式命令行模式,用户可以通过将多个命令保存在一个脚本文件中,并将这个文件作为参数传递给vivado执行.类似 =bash= 脚本.
+
+* 一些有用的Vivado文档
+** 用Vivado的两种模式(GUI和TCL)来管理项目
+[[https://docs.xilinx.com/r/en-US/ug888-vivado-design-flows-overview-tutorial/Using-the-Non-Project-Design-Flow]]
+
+这篇文档的 =Additional Resources and Legal Notices= 部分非常丰富,都至少需要浏览一遍.

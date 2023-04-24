@@ -1,7 +1,7 @@
 +++
 title = "C++拾遗"
 date = 2023-04-03T20:21:00+08:00
-lastmod = 2023-04-07T12:55:54+08:00
+lastmod = 2023-04-24T16:52:01+08:00
 tags = ["C++"]
 categories = ["C++"]
 draft = false
@@ -121,6 +121,12 @@ for(auto ele : eles) {
 #### shared_ptr和unique_ptr的值可以赋给普通指针吗? {#shared-ptr和unique-ptr的值可以赋给普通指针吗}
 
 可以,这两个智能指针只是C++11 **方便** 程序员来管理指针的语法,如果非得把智能指针的值赋给普通指针当然是可以的,但是如果智能指针主动把所指向对象给删除了,此时普通指针还指向的是对象所属的那块内存,这时普通指针就是悬空指针了.
+
+
+### <span class="org-todo todo TODO">TODO</span> function {#function}
+
+
+### <span class="org-todo todo TODO">TODO</span> constexpr {#constexpr}
 
 
 ## C++14 {#c-plus-plus-14}
