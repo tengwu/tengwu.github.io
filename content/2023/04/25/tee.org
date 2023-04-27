@@ -1,0 +1,35 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/04
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-04-25 Wed 17:36]
+#+TITLE: TEE
+#+HUGO_TAGS: TEE Security
+#+HUGO_CATEGORIES: Security
+#+STARTUP: inlineimages
+
+
+* toread
+- SGX paper: Innovative Instructions and Software Model for Isolated Execution.
+- [1, 3–6, 11, 12, 24, 26, 30, 44, 45, 47, 50, 53]
+
+* concepts
+** TODO VN
+** TODO MAC
+** TODO Encrypt & AES*
+** TODO TEE
+** TODO DOING SGX
+** TODO ASLR(Address space layout randomization)
+
+* courses
+- [[https://cs61c.org/sp23/][UCB cs61C]]
+  - [[https://github.com/61c-teach/sp23-lab-starter][lab-starter]]
+  - [[https://cs61c.org/sp23/labs/lab04/][lab04]]
+- [[https://comp97109.doc.ic.ac.uk/]]
+- [[https://csdiy.wiki][csdiy.wiki]]
+
+* manuals
+- [[https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/library.html][Intel SGX documentation]]
+- [[https://www.intel.com/content/www/us/en/developer/articles/technical/virtualizing-intel-software-guard-extensions-with-kvm-and-qemu.html][Virtualizing Intel® Software Guard Extensions with KVM and QEMU]]
