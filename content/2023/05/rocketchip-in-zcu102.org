@@ -1,0 +1,13 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/05
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: true
+#+DATE: [2023-05-08 Mon 18:08]
+#+TITLE: 在ZCU102开发板上启动Rocket Chip
+#+HUGO_TAGS: FPGA RocketChip
+#+HUGO_CATEGORIES: FPGA 处理器
+#+STARTUP: inlineimages
+
+这两天在尝试把[[https://github.com/chipsalliance/rocket-chip][Rocket Chip]]在[[https://www.xilinx.com/products/boards-and-kits/ek-u1-zcu102-g.html][Xilinx ZCU102]]这个板子上跑起来,但其实[[https://github.com/li3tuo4/rc-fpga-zcu][之前已经有人做过这项工作了]],所以决定先按照别人的流程跑一遍,看看他们是怎么实现的,然后再把最新的Rocket Chip移植上去.
