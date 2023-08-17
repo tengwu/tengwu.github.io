@@ -1,0 +1,81 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/08
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-08-16 Wed 19:58]
+#+TITLE: CS161 notes
+#+HUGO_TAGS: Security Courses
+#+HUGO_CATEGORIES: Security
+#+STARTUP: inlineimages
+
+* memory safety vulnerabilities
+
+** stack
+
+*** stack overflow
+
+不安全的输入函数会导致栈上的内容被覆盖,如果栈的返回地址被覆盖,会导致控制流转移到不合适的地方.
+
+*** format string vulnerability
+
+printf()通过格式化字符串来推断参数的个数,可以通过这个特性来将栈上的内容打印出来,例如,如果栈上存在一个密钥key,可以通过各种办法将key打印出来(请思考,具体的场景是什么?).
+
+*** integer conversion vulnerabilities
+
+一码胜千言:
+#+BEGIN_SRC c
+  char buf[8];
+  void vulnerable() {
+      int len = read_int_from_network();
+      char *p = read_string_from_network();
+      if (len > 8) {  /* 1 */
+          error("length too large: bad dog, no cookie for you!");
+          return;
+      }
+      memcpy(buf, p, len);  /* 2 */
+  }
+#+END_SRC
+
+在1处,如果 =len= 为-1,不会进入 =if= 分支,也就是说会执行 =memcpy= , =memcpy= 的第三个参数是 =size_t= 类型,在大部分系统上, =size_t= 其实是 =unsigned int= , =len= 为-1时,转换成 =unsigned int= 就是最大的无符号数,所以这个 =memcpy= 调用会将很长的数据从 =p= 中复制到 =buf= 中,这时就出现了buffer溢出.
+
+another case:
+#+BEGIN_SRC c
+void vulnerable() {
+    size_t len;
+    char *buf;
+
+    len = read_int_from_network();
+    buf = malloc(len+5);
+    read(fd, buf, len);
+    ...
+}
+#+END_SRC
+
+请思考,当 =len=-1= 时,将会发生什么?
+
+*** off-by-one vulnerabilities
+
+中文是差一漏洞,一个比较常见的场景是,通过这个漏洞,可以向缓冲区+1的位置写入数据,这个位置很有可能是caller的 =ebp= ,这样的话,可以让 *caller* 返回的时候栈上的 =eip= 变成任意值,从而操作控制流的转移.
+
+详细信息请参考[[https://textbook.cs161.org/memory-safety/vulnerabilities.html][textbook 3.5节]],这本书写得太好了.
+
+** heap 
+
+*** heap overflow
+
+C++的vtable指针漏洞.
+
+C++中为对象分配的动态内存在堆中,且一个对象的最低8个字节内存为虚表的指针,如果两个连续的C++对象,且地址较低的内存
+
+*** use-after-free
+
+攻击者释放的漏洞被分配给了受害者,但是攻击者仍然持有指针,就好像攻击者和受害者共享一块内存.
+
+** other
+
+*** danling pointer
+
+*** double free
+
