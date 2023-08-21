@@ -1,0 +1,30 @@
+#+OPTIONS: author:nil ^:{}
+#+HUGO_BASE_DIR: ../../../..
+#+HUGO_SECTION: post/2023/08
+#+HUGO_CUSTOM_FRONT_MATTER: :toc true
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_DRAFT: false
+#+DATE: [2023-08-07 Mon 12:44]
+#+TITLE: Rust学习
+#+HUGO_TAGS: PL
+#+HUGO_CATEGORIES: PL
+#+STARTUP: inlineimages
+
+* Overview
+大致浏览了一遍[[https://rustwiki.org/docs/book/][Rust程序设计语言]],相比于C++,Rust添加了很多硬性规定来保证程序的安全性.比如: 在变量的所有权机制中,将变量赋值给另一个变量会造成变量的move,这相当于将C++中所有的变量赋值操作实现为了move语意.如果要通过类比来学习,就得了解一下Rust都加入了哪些强制的convention,以及为什么要加入这些convention.本篇博客作为备忘,用来记录Rust中这些"新概念".
+
+** 数据类型
+
+*** 标量类型
+
+- i8/16/32/64/128/size,isize和机器字长有关系.
+- f32/64.
+- bool.
+- char.4个字节,表示Unicode标量值.
+
+*** 复合类型
+- 元组
+- 数组: 定长
+
+** 
+

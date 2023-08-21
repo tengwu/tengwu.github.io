@@ -79,3 +79,11 @@ C++中为对象分配的动态内存在堆中,且一个对象的最低8个字节
 
 *** double free
 
+** 防御措施
+
+*** stack canary
+
+*** pointer authentication
+
+*** address space layout randomization(ASLR)
+

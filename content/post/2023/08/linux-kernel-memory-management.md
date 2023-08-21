@@ -1,7 +1,7 @@
 +++
 title = "Linux内存管理"
 date = 2023-08-17T13:19:00+08:00
-lastmod = 2023-08-17T13:48:48+08:00
+lastmod = 2023-08-21T13:20:38+08:00
 tags = ["Kernel", [",", "OS"]]
 categories = ["Kernel"]
 draft = false
@@ -31,7 +31,102 @@ toc = true
 本文主要从初始化,内存分配,内存回收三方面来讨论这两大机制.初始化是指获取物理内存的大小,物理地址等信息,并且使用一个数据结构来维护这些信息;内存分配和回收也都是在维护这一数据结构.一旦物理内存管理初始化完毕,内核会 **主要** 通过相关接口来获取物理内存(有可能在一些需要优化的场景不会使用这些接口).
 
 
+### memblock结构 {#memblock结构}
+
+`memblock` 的结构比较简单,可以先通过一张图来感受一下.
+
+{{< figure src="/images/memblock_struct.png" >}}
+
+即 `memblock` 通过两个 `memblock_region` 数组来维护早期物理内存的状态.其中, `memocy->regions` 维护的是未使用内存的信息, `reserved->regions` 维护的是已使用内存的信息.
+
+更详细地说 `memblock_region` 通过 `regions(struct memblock_region类型)` 这个有序数组来维护内存区域,针对每个region维护其起始地址 `base` 和其大小 `size` .内核保证 `regions` 里region之间没有相交的部分.并且在进行memblock相关操作时,会将相邻的region进行合并.
+
+以下是具体的数据结构:
+
+```c
+struct memblock {
+  bool bottom_up;  /* is bottom up direction? */
+  phys_addr_t current_limit;
+  struct memblock_type memory;
+  struct memblock_type reserved;
+};
+
+struct memblock_type {
+  unsigned long cnt;
+  unsigned long max;
+  phys_addr_t total_size;
+  struct memblock_region *regions;
+  char *name;
+};
+
+struct memblock_region {
+  phys_addr_t base;
+  phys_addr_t size;
+  enum memblock_flags flags;
+#ifdef CONFIG_NEED_MULTIPLE_NODES
+  int nid;
+#endif
+};
+```
+
+`memblock` 的定义在 `mm/memblock.c` 中.
+
+```c
+struct memblock memblock __initdata_memblock = {
+  .memory.regions		= memblock_memory_init_regions,
+  .memory.cnt		= 1,	/* empty dummy entry */
+  .memory.max		= INIT_MEMBLOCK_REGIONS,
+  .memory.name		= "memory",
+
+  .reserved.regions	= memblock_reserved_init_regions,
+  .reserved.cnt		= 1,	/* empty dummy entry */
+  .reserved.max		= INIT_MEMBLOCK_RESERVED_REGIONS,
+  .reserved.name		= "reserved",
+
+  .bottom_up		= false,
+  .current_limit		= MEMBLOCK_ALLOC_ANYWHERE,
+};
+```
+
+
 ### 初始化阶段(启动阶段) {#初始化阶段--启动阶段}
+
+在ARM64中,内核通过解析[设备树](https://docs.kernel.org/devicetree/usage-model.html)来获取设备的位置和大小,其中就包含了内存.
+
+根据设备树文档的描述:
+
+> Typically the early_init_dt_scan_chosen() helper
+> is used to parse the chosen node including kernel parameters,
+> early_init_dt_scan_root() to initialize the DT address space model,
+> and early_init_dt_scan_memory() to determine the size and
+> location of usable RAM.
+
+即,内核通过 `early_init_dt_scan_memory()` 函数来获取内存信息,来看一下这个函数.
+
+```c
+int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
+                                     int depth, void *data)
+{
+  // ...
+  reg = of_get_flat_dt_prop(node, "linux,usable-memory", &l);
+  // ...
+  while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {
+    // 遍历device tree的每个和内存相关的节点
+    u64 base, size;
+
+    base = dt_mem_next_cell(dt_root_addr_cells, &reg);
+    size = dt_mem_next_cell(dt_root_size_cells, &reg);
+
+    // ...
+
+    early_init_dt_add_memory_arch(base, size);
+
+    // ...
+  }
+}
+```
+
+在 `early_init_dt_add_memory_arch()` 函数里,通过 `memblock_add()` 将从设备树中解析到的内存添加到 `memblock.memory` 结构里.
 
 
 ### 运行阶段(启动后的阶段) {#运行阶段--启动后的阶段}
